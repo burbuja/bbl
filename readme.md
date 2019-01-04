@@ -1,4 +1,4 @@
-# bbl - A simple script that helps you to create translations
+# bbl - A simple script that helps you create translations
 ## Usage
 ```bash
 bbl.py  <script_name>
