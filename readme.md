@@ -17,7 +17,7 @@ The main goal is to show that NetBox can be translated, but this script may brea
 ./bbl.php get [PROJECT] [-d[DIR]]
 ./bbl.php merge [PROJECT] [-d[DIR]] [-p[FILE|URL] [-l[LOCALE]]
 ```
-## Examples for PHP version
+### Examples for PHP version
 ```bash
 ./bbl.php get opencart -d /path/to/opencart
 ./bbl.php merge opencart -d /path/to/opencart -p /path/to/opencart.po -l es-cl
