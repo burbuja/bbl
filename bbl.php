@@ -41,7 +41,7 @@ if (in_array($argv[2], $projects)) {
 $key = array_search('-d', $argv);
 if ($key && array_key_exists($key + 1, $argv)) {
     $dn = realpath($argv[$key + 1]);
-    $tdn = str_replace('\\', '/', realpath(__DIR__)) . '/' . $argv[$key + 1] . '_trans';
+    $tdn = $dn . '_trans';
 } else {
     echo 'Directory not specified!' . PHP_EOL;
     exit;
