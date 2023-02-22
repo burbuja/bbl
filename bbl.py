@@ -27,7 +27,7 @@ else:
 Validate if project name is supported
 '''
 projects = [
-	'digitalocean/netbox',
+	'netbox-community/netbox',
 ]
 project = sys.argv[1]
 if project not in projects:
@@ -37,26 +37,25 @@ if project not in projects:
 '''
 Get the version number from GitHub
 '''
-def getVersion(project):
+def getTag(project):
 	f = urllib.request.urlopen('https://github.com/' + project + '/releases/latest')
 	c = f.read()
 	html = etree.HTML(c)
 	etree.tostring(html, pretty_print=True, method='html')
 	values = html.xpath("//div[contains(@class,'label-latest')]/div/div/ul/li/a/span/text()")
-	version = values[0]
-
-	if version:
-		return version
+	if len(values) != 0:
+		version = values[0]
+		if version:
+			return version
 	else:
-		url = urllib.request.urlopen("https://api.github.com/repos/digitalocean/netbox/releases/latest")
+		url = urllib.request.urlopen('https://api.github.com/repos/' + project + '/releases/latest')
 		data = json.loads(url.read().decode())
 		version = data['tag_name']   
 		return version
 
-versionString = getVersion(project)
-version = versionString.replace('v', '')
-
-print('Fetching the version', version)
+tag = getTag(project)
+version = tag.replace('v', '')
+print('Fetching the version', version + '.')
 
 '''
 Download the zip file from GitHub and uncompress it
@@ -64,7 +63,7 @@ Download the zip file from GitHub and uncompress it
 fn = 'netbox-' + version + '.zip'
 if not Path(fn).is_file():
 	print('Downloading the ZIP file.')
-	z = urllib.request.urlopen('https://github.com/digitalocean/netbox/archive/' + versionString + '.zip')
+	z = urllib.request.urlopen('https://github.com/netbox-community/netbox/archive/' + tag + '.zip')
 	c = z.read()
 	f = open(fn, 'wb')  
 	f.write(c)
@@ -95,7 +94,7 @@ Declare the patterns
 po_patterns = [
 	r'msgid\s"(.+)"\nmsgstr\s"(.+)"\n',
 ]
-if project == 'digitalocean/netbox':
+if project == 'netbox-community/netbox':
 	patterns = [
 		r'[\s\(]help_text\s?=\s?[\'"]([^\'].+)[\'"][,\n]',
 		r'[\s\(]null_label\s?=\s?[\'"]([^\'].+)[\'"][,\n]',
@@ -144,7 +143,8 @@ if action == 'get':
 	phrases = []
 	for f in fl:
 		fn, fe = os.path.splitext(f)
-		if fe == '.py' and not 'migrations' in f:
+		if fe == '.py' and not 'migrations' in fn and not 'test_' in fn:
+			print(f)
 			o = open(f, 'r')
 			c = o.read()
 			for p in patterns:
@@ -167,7 +167,8 @@ if action == 'get':
 							for m in match:
 								if m not in phrases:
 									phrases.append(m)
-		if fe == '.html' and not 'jquery-ui-' in fn:
+		if fe == '.html' and not 'jquery-ui-' in fn and not 'project-static' in fn:
+			print(f)
 			o = open(f, 'r')
 			c = o.read()
 			for p in html_patterns:
@@ -191,7 +192,7 @@ if action == 'get':
 		po.write('msgstr ""\n')
 		po.write('\n')
 	po.close()
-	print('The file netbox-' + version + '.po, has been successfully created!')
+	print('The file netbox-' + version + '.po has been successfully created!')
 
 if action == 'merge':
 	'''
@@ -204,7 +205,7 @@ if action == 'merge':
 		o = open(po, 'r', encoding='utf8')
 	c = o.read()
 	for p in po_patterns:
-		m = re.findall(p, c)
+		m = re.findall(p, c.decode('utf-8'))
 	d = dict(m)
 
 	'''
@@ -216,7 +217,7 @@ if action == 'merge':
 			nf = f.replace('netbox-' + version, 'netbox-translated-' + version)
 			os.makedirs(os.path.dirname(nf), exist_ok=True)
 			copyfile(f, nf)
-			if fe == '.py' and not 'migrations' in f:
+			if fe == '.py' and not 'migrations' in f and not 'tests' in f:
 				o = open(f, 'r')
 				c = o.read()
 				for p in patterns:
