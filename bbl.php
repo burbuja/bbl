@@ -148,17 +148,20 @@ switch ($project) {
                             $c = '<?php' .
                             PHP_EOL .
                             PHP_EOL;
-                            foreach($_ as $k => $v) {
-                                array_walk_recursive(
-                                    $_,
-                                    function (&$v, $k) {
-                                        global $d;
-                                        $dk = array_search($v, array_column($d, 'original'));
-                                        if ($dk) {
-                                            $v = $d[$dk]['translated'];
-                                        }
+                            array_walk(
+                                $_,
+                                function (&$v, $k) {
+                                    global $d;
+                                        $v = addslashes($v);
+                                        $v = str_replace('\\\'', '\'', $v);
+                                        $v = str_replace("\n", '\n', $v);
+                                    $dk = array_search($v, array_column($d, 'original'));
+                                    if ($dk) {
+                                        $v = $d[$dk]['translated'];
                                     }
-                                );
+                                }
+                            );
+                            foreach($_ as $k => $v) {
                                 $c.= '$_[\'' . $k . '\'] = \'' . str_replace ( '\\"', '"', str_replace ( '\'', '\\\'', $_[$k])) . '\';' . "\n";
                             }
                             $f = str_replace('en-gb', $locale, $f);
@@ -188,7 +191,7 @@ switch ($project) {
                     $tdn . '/upload/install/language/' . $locale . '/' . $locale . '.png',
                     $tdn . '/upload/catalog/language/' . $locale . '/' . $locale . '.png'
                 );
-                echo 'Translated files have been written in "' . $tdn . '".' . PHP_EOL;
+                echo 'Translated files have been written to "' . $tdn . '".' . PHP_EOL;
             break;
         }
     break;
