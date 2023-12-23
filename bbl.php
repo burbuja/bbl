@@ -175,22 +175,6 @@ switch ($project) {
                         }
                     }
                 }
-                # Download flag
-                if (!file_exists($tdn . '/upload/install/language/' . $locale . '/' . $locale . '.png')) {
-                    $o = fopen('https://raw.githubusercontent.com/opencart/opencart/31323f8ce70338e88570217f76e1111f7b2bcc8f/upload/image/flags/cl.png', 'r');
-                    $c = stream_get_contents($o);
-                    fclose($o);
-                    $o = fopen($tdn . '/upload/install/language/' . $locale . '/' . $locale . '.png', 'w');
-                    fwrite ($o, $c);
-                }
-                copy(
-                    $tdn . '/upload/install/language/' . $locale . '/' . $locale . '.png',
-                    $tdn . '/upload/admin/language/' . $locale . '/' . $locale . '.png'
-                );
-                copy(
-                    $tdn . '/upload/install/language/' . $locale . '/' . $locale . '.png',
-                    $tdn . '/upload/catalog/language/' . $locale . '/' . $locale . '.png'
-                );
                 echo 'Translated files have been written to "' . $tdn . '".' . PHP_EOL;
             break;
         }
